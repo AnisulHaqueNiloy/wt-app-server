@@ -31,7 +31,7 @@ app.use("/api/auth", authRoutes);
 
  
 
-// --- Error Handling Middlewares ---
+// Error handling middlewares
 
 app.use(notFound);
 // 2. Global Error Handler
