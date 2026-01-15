@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 const authRoutes = require("./routes/authRoutes");
+const msgRoutes = require("./routes/msgRoute");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.get("/", (req, res) => {
 // --- Routes Integration ------
 
 app.use("/api/auth", authRoutes);
+app.use("/api/message", msgRoutes);
 
 // Error handling middlewares
 
