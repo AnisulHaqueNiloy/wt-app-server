@@ -5,7 +5,6 @@ const cookieParser = require("cookie-parser");
 
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 const authRoutes = require("./routes/authRoutes");
- 
 
 const app = express();
 
@@ -14,7 +13,11 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://your-frontend-domain.com"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://your-frontend-domain.com",
+    ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -28,8 +31,6 @@ app.get("/", (req, res) => {
 // --- Routes Integration ------
 
 app.use("/api/auth", authRoutes);
-
- 
 
 // Error handling middlewares
 
