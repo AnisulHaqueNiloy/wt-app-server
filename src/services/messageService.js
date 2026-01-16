@@ -43,18 +43,18 @@ const sendBulk = async (numbers, messageText, userId) => {
         `❌ Error for ${number}:`,
         error.response?.data?.message || error.message
       );
-      console.log(error.response)
+      console.log(error.response);
 
       await Message.create({
         userId,
         phoneNumber: number,
-        
+
         messageContent: messageText,
         status: "failed",
       });
       global.io.emit("msgStatus", { index: i, status: "failed" });
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
   global.io.emit("campaignFinished");
 };
