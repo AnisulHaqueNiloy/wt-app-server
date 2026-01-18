@@ -7,6 +7,7 @@ const { notFound, errorHandler } = require("./middlewares/errorHandler");
 const authRoutes = require("./routes/authRoutes");
 const msgRoutes = require("./routes/msgRoute");
 const settingRoutes = require("./routes/settingRoutes");
+const sessionRoutes = require("./routes/sessionRoutes");
 
 
 const app = express();
@@ -36,11 +37,12 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/message", msgRoutes);
 app.use("/api/user/", settingRoutes)
+app.use("/api/session/", sessionRoutes)
 
 // Error handling middlewares
 
 app.use(notFound);
-// 2. Global Error Handler
+// 2. Global Error Handler 
 app.use(errorHandler);
 
 module.exports = app;
