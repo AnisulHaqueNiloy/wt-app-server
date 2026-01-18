@@ -20,6 +20,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
+      "https://remarkable-bubblegum-50daf9.netlify.app",
       "https://your-frontend-domain.com",
     ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
