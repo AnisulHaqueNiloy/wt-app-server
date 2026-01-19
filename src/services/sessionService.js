@@ -10,25 +10,30 @@ const getWhatsAppSessionStatus = async () => {
       throw new Error("WASENDER_API_TOKEN is missing in .env file");
     }
 
-    const response = await axios.get("https://www.wasenderapi.com/api/whatsapp-sessions", {
-      headers: {
-        'Authorization': `Bearer ${apiToken.trim()}`,
-        'Accept': 'application/json'
-      }
-    });
+    const response = await axios.get(
+      "https://www.wasenderapi.com/api/whatsapp-sessions",
+      {
+        headers: {
+          Authorization: `Bearer ${apiToken.trim()}`,
+          Accept: "application/json",
+        },
+      },
+    );
 
     const sessions = response.data?.data || [];
-    const mainSession = sessions[0]; 
-    console.log(mainSession)
+    const mainSession = sessions[0];
+    console.log(mainSession);
 
     return {
       status: mainSession?.status || "disconnected",
-      number: mainSession?.phone_number || "Not Linked"
+      number: mainSession?.phone_number || "Not Linked",
     };
   } catch (error) {
     console.error("Wasender Error:", error.response?.data || error.message);
-    throw new Error(error.response?.data?.message || "Invalid API Token or Connection Error");
+    throw new Error(
+      error.response?.data?.message || "Invalid API Token or Connection Error",
+    );
   }
 };
 
-module.exports = { getWhatsAppSessionStatus};
+module.exports = { getWhatsAppSessionStatus };

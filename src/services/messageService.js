@@ -67,13 +67,15 @@ const User = require("../models/User"); // User model lagbe token load korar jon
 const sendBulk = async (numbers, messageText, userId) => {
   // 1. Database theke oi specific user-er profile load koro
   const user = await User.findById(userId);
-  
+
   // 2. User-er profile theke token-ta naw (Settings page-e jeta save koreche)
   const API_TOKEN = user?.waToken;
 
   if (!API_TOKEN) {
     console.error("❌ No API Token found for user:", userId);
-    global.io.emit("error", { message: "Please set your Wasender API Key in Settings first!" });
+    global.io.emit("error", {
+      message: "Please set your Wasender API Key in Settings first!",
+    });
     return;
   }
 
@@ -112,9 +114,11 @@ const sendBulk = async (numbers, messageText, userId) => {
       } else {
         throw new Error(response.data.message || "Failed");
       }
-
     } catch (error) {
-      console.error(`❌ Error for ${number}:`, error.response?.data?.message || error.message);
+      console.error(
+        `❌ Error for ${number}:`,
+        error.response?.data?.message || error.message
+      );
 
       await Message.create({
         userId,
