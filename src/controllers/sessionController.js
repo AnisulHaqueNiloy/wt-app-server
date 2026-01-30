@@ -1,5 +1,8 @@
+const {
+  getWhatsAppSessionStatus,
+  createWhatsAppSession,
+} = require("../services/sessionService");
 
-const {getWhatsAppSessionStatus} = require("../services/sessionService");
 
 const getSessionStatus = async (req, res) => {
   try {
@@ -8,7 +11,7 @@ const getSessionStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      ...sessionInfo
+      ...sessionInfo,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

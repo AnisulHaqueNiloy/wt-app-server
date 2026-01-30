@@ -1,5 +1,6 @@
 const axios = require("axios");
 dotenv = require("dotenv").config();
+const WASession = require("../models/Session");
 
 const getWhatsAppSessionStatus = async () => {
   try {
@@ -35,5 +36,7 @@ const getWhatsAppSessionStatus = async () => {
     );
   }
 };
+
+
 
 module.exports = { getWhatsAppSessionStatus };

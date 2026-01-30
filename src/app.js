@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const msgRoutes = require("./routes/msgRoute");
 const settingRoutes = require("./routes/settingRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
+const waRoutes = require("./routes/waRoutes");
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/message", msgRoutes);
 app.use("/api/user/", settingRoutes);
 app.use("/api/session/", sessionRoutes);
+app.use("/api/wa/", waRoutes);
 
 // Error handling middlewares
 
