@@ -8,10 +8,10 @@ const {
 const setTokenCookie = (res, token) => {
   const cookieOptions = {
     httpOnly: true,
-    secure: false,
+    secure: true, //false
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    // sameSite: "none",
-    sameSite: "strict",
+    sameSite: "none",
+    // sameSite: "strict",
   };
   res.cookie("jwt", token, cookieOptions);
 };

@@ -4,7 +4,7 @@ const getAnalytics = async (req, res) => {
   try {
     const userId = req.user.id;
     
-    // Service call kora
+ 
     const analyticsData = await getMessageAnalytics(userId);
 
     res.status(200).json({

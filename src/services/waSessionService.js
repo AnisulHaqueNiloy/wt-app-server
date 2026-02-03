@@ -4,14 +4,14 @@ const WASession = require("../models/Session");
 const WASENDER_BASE_URL = "https://www.wasenderapi.com/api";
 const Token = process.env.WASENDER_API_TOKEN;
 
-// হেডার ফাংশন যেখানে সরাসরি এনভায়রনমেন্ট টোকেন ব্যবহার করা হচ্ছে
+
 const getHeaders = () => ({
   Authorization: `Bearer ${Token.trim()}`,
   Accept: "application/json",
 });
 
 /**
- * Step 1: WASender এ সেশন তৈরি এবং ডাটাবেসে সেভ
+
  */
 const createWASession = async (userId, name, phoneNumber) => {
   // ১. WASender API-তে সেশন তৈরি
@@ -27,7 +27,7 @@ const createWASession = async (userId, name, phoneNumber) => {
 
   const sessionIdFromAPI = response.data.data.id;
 
-  // ২. ডাটাবেসে সেভ বা আপডেট করা
+
   return await WASession.findOneAndUpdate(
     { userId: userId },
     {
@@ -42,7 +42,7 @@ const createWASession = async (userId, name, phoneNumber) => {
 };
 
 /**
- * Step 2: সেশন কানেক্ট করার রিকোয়েস্ট পাঠানো
+
  */
 const connectWASession = async (sessionId) => {
   await axios.post(
@@ -70,7 +70,7 @@ const getQRAndCheckStatus = async (sessionId) => {
       { headers: getHeaders() },
     );
 
-    // API থেকে আসা পুরো ডাটাটি দেখুন
+   
     console.log("WASender API Response Data:", response.data);
 
     const qr = response.data?.data?.qrCode;
@@ -85,7 +85,7 @@ const getQRAndCheckStatus = async (sessionId) => {
       { new: true },
     );
 
-    // সকেট পাঠানোর আগে ডাটা চেক করুন
+   
     if (global.io) {
       console.log(`Emitting Socket Event: session_update_${sessionId}`);
       console.log(`Socket Payload: { status: ${updatedSession.status} }`);
@@ -111,14 +111,14 @@ const getQRAndCheckStatus = async (sessionId) => {
 
 const getSecureApiKey = async (sessionId) => {
   try {
-    // ১. ডাটাবেস থেকে সেশনটি খুঁজে বের করা
+  
     const session = await WASession.findOne({ sessionId });
 
     if (!session) {
       throw new Error("Session not found");
     }
 
-    // ২. WASender API থেকে লেটেস্ট স্ট্যাটাস কনফার্ম করা
+   
     const response = await axios.get(
       `${process.env.WASENDER_BASE_URL}/whatsapp-sessions/${sessionId}`,
       {
@@ -131,7 +131,7 @@ const getSecureApiKey = async (sessionId) => {
 
     const remoteStatus = response.data?.data?.status;
 
-    // ৩. যদি কানেক্টেড থাকে তবেই কী (Key) রিটার্ন করা
+   
     if (remoteStatus === "connected" || remoteStatus === "ready") {
       return {
         success: true,
@@ -162,7 +162,7 @@ const fetchAllWasenderSessions = async () => {
         },
       },
     );
-    return response.data; // API থেকে আসা সব সেশন ডাটা
+    return response.data; 
   } catch (error) {
     throw new Error("Wasender API calling failed!");
   }

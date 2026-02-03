@@ -10,10 +10,9 @@ const processBulkSMS = async (req, res) => {
 
 const getHistory = async (req, res) => {
   try {
-    // MongoDB-r built-in .sort() use koro, eita fast ebong error-free
+    
     const history = await Message.find({ userId: req.user.id })
-      .sort({ createdAt: -1 }); // 'sentAt' thakle 'sentAt' dao, usually 'createdAt' thake
-
+      .sort({ createdAt: -1 });  
     res.status(200).json({ success: true, history });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

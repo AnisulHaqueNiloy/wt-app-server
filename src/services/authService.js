@@ -52,7 +52,7 @@ const logoutUser = async () => {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict", // যদি ফ্রন্টএন্ড এবং ব্যাকএন্ড আলাদা ডোমেইন হয়
+    sameSite: "none",  
     path: "/",
   };
 };

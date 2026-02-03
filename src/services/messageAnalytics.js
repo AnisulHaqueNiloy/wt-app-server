@@ -3,12 +3,12 @@ const Message = require("../models/Message");
 
 const getMessageAnalytics = async (userId) => {
   try {
-    // String userId-ke MongoDB ObjectId-te convert kora
+    
     const userObjectId = new mongoose.Types.ObjectId(userId);
 
     const stats = await Message.aggregate([
       { 
-        $match: { userId: userObjectId } // Ekhon match korbe 100%
+        $match: { userId: userObjectId }
       },
       {
         $group: {
@@ -40,6 +40,6 @@ const getMessageAnalytics = async (userId) => {
 };
 
 module.exports = {
-  // baki service gulo...
+
   getMessageAnalytics,
 };

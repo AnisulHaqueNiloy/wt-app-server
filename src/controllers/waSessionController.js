@@ -3,12 +3,12 @@ const waService = require("../services/waSessionService");
 
 /**
  * STEP 1: Create Session
- * ড্যাশবোর্ড থেকে নাম এবং নম্বর দিলে এই API কল হবে।
+ * 
  */
 const createSession = async (req, res) => {
   try {
     const { name, phoneNumber } = req.body;
-    const userId = req.user._id; // Auth Middleware থেকে প্রাপ্ত
+    const userId = req.user._id;  
 
     if (!name || !phoneNumber) {
       return res.status(400).json({
@@ -39,7 +39,7 @@ const createSession = async (req, res) => {
 
 /**
  * STEP 2: Connect Session
- * "Connect Now" বাটনে ক্লিক করলে এই API কল হবে।
+ *
  */
 const connectSession = async (req, res) => {
   try {
@@ -73,14 +73,14 @@ const connectSession = async (req, res) => {
 
 /**
  * STEP 3: Get QR & Status (For Polling)
- * ফ্রন্টএন্ড থেকে প্রতি ৫ সেকেন্ড পর পর এই API কল হবে।
+ *
  */
 const getQRStatus = async (req, res) => {
   try {
     const { sessionId } = req.params;
     const session = await waService.getQRAndCheckStatus(sessionId);
 
-    // যদি অলরেডি কানেক্ট হয়ে যায়, সকেটে একটা ফাইনাল মেসেজ পাঠান
+    
     if (session.status === "connected" && global.io) {
       global.io.emit(`session_connected_${sessionId}`, {
         message: "Your WhatsApp is now linked!",
@@ -113,7 +113,7 @@ const getApiKeyHandler = async (req, res) => {
     if (result.success) {
       return res.status(200).json(result);
     } else {
-      return res.status(403).json(result); // Forbidden যদি কানেক্টেড না থাকে
+      return res.status(403).json(result);  
     }
   } catch (error) {
     res.status(500).json({
@@ -127,7 +127,7 @@ const getApiKeyHandler = async (req, res) => {
 
 const getSessions = async (req, res) => {
   try {
-    // এই টোকেনটি আপনার .env ফাইলে রাখা উচিত
+    
     const token = process.env.WASENDER_TOKEN;
     const sessions = await waService.fetchAllWasenderSessions(token);
 
