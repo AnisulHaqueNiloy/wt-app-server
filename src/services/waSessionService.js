@@ -63,24 +63,126 @@ const connectWASession = async (sessionId) => {
  */
 const getQRAndCheckStatus = async (sessionId) => {
   try {
+    console.log(`--- Checking Status for Session: ${sessionId} ---`);
+
     const response = await axios.get(
       `${WASENDER_BASE_URL}/whatsapp-sessions/${sessionId}/qrcode`,
       { headers: getHeaders() },
     );
 
-    console.log(response.data);
+    // API থেকে আসা পুরো ডাটাটি দেখুন
+    console.log("WASender API Response Data:", response.data);
 
     const qr = response.data?.data?.qrCode;
-    console.log("Fetched QR Code:", qr);
+    const status = response.data?.data?.status;
 
-    return await WASession.findOneAndUpdate(
+    console.log(`Current Status from API: ${status}`);
+    if (qr) console.log("QR Code received from API.");
+
+    const updatedSession = await WASession.findOneAndUpdate(
       { sessionId },
-      { qrCode: qr, status: qr ? "pending" : "initializing" },
+      { qrCode: qr, status: status || (qr ? "pending" : "initializing") },
       { new: true },
     );
+
+    // সকেট পাঠানোর আগে ডাটা চেক করুন
+    if (global.io) {
+      console.log(`Emitting Socket Event: session_update_${sessionId}`);
+      console.log(`Socket Payload: { status: ${updatedSession.status} }`);
+
+      global.io.emit(`session_update_${sessionId}`, {
+        status: updatedSession.status,
+        qrCode: updatedSession.qrCode,
+      });
+    } else {
+      console.warn("Socket.io (global.io) is NOT initialized!");
+    }
+
+    return updatedSession;
   } catch (error) {
+    console.error(
+      "Error in getQRAndCheckStatus:",
+      error.response?.data || error.message,
+    );
     const currentSession = await WASession.findOne({ sessionId });
     return currentSession;
+  }
+};
+
+const getSecureApiKey = async (sessionId) => {
+  try {
+    // ১. ডাটাবেস থেকে সেশনটি খুঁজে বের করা
+    const session = await WASession.findOne({ sessionId });
+
+    if (!session) {
+      throw new Error("Session not found");
+    }
+
+    // ২. WASender API থেকে লেটেস্ট স্ট্যাটাস কনফার্ম করা
+    const response = await axios.get(
+      `${process.env.WASENDER_BASE_URL}/whatsapp-sessions/${sessionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.WASENDER_API_TOKEN}`,
+          Accept: "application/json",
+        },
+      },
+    );
+
+    const remoteStatus = response.data?.data?.status;
+
+    // ৩. যদি কানেক্টেড থাকে তবেই কী (Key) রিটার্ন করা
+    if (remoteStatus === "connected" || remoteStatus === "ready") {
+      return {
+        success: true,
+        apiKey: session.api_Key || `WA_KEY_${session.sessionId}_SECURE`, // ডাটাবেসে থাকলে সেটা, নাহলে জেনারেট করা
+        status: remoteStatus,
+        message: "API Key fetched successfully",
+      };
+    } else {
+      return {
+        success: false,
+        status: remoteStatus,
+        message: "Device is not connected yet.",
+      };
+    }
+  } catch (error) {
+    console.error("Service Error:", error.message);
+    throw error;
+  }
+};
+
+const fetchAllWasenderSessions = async () => {
+  try {
+    const response = await axios.get(
+      "https://www.wasenderapi.com/api/whatsapp-sessions",
+      {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+        },
+      },
+    );
+    return response.data; // API থেকে আসা সব সেশন ডাটা
+  } catch (error) {
+    throw new Error("Wasender API calling failed!");
+  }
+};
+
+const deleteWasenderSession = async (sessionId, token) => {
+  try {
+    const response = await axios.delete(
+      `https://www.wasenderapi.com/api/whatsapp-sessions/${sessionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Wasender API Delete failed!";
+    throw new Error(errorMessage);
   }
 };
 
@@ -88,4 +190,7 @@ module.exports = {
   createWASession,
   connectWASession,
   getQRAndCheckStatus,
+  getSecureApiKey,
+  fetchAllWasenderSessions,
+  deleteWasenderSession,
 };

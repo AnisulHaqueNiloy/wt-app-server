@@ -78,28 +78,90 @@ const connectSession = async (req, res) => {
 const getQRStatus = async (req, res) => {
   try {
     const { sessionId } = req.params;
+    const session = await waService.getQRAndCheckStatus(sessionId);
 
-    if (!sessionId) {
-      return res.status(400).json({
-        success: false,
-        message: "Session ID is required",
+    // যদি অলরেডি কানেক্ট হয়ে যায়, সকেটে একটা ফাইনাল মেসেজ পাঠান
+    if (session.status === "connected" && global.io) {
+      global.io.emit(`session_connected_${sessionId}`, {
+        message: "Your WhatsApp is now linked!",
       });
     }
 
-    const session = await waService.getQRAndCheckStatus(sessionId);
-
-    // ফ্রন্টএন্ড এই ডাটা দেখে ডিসিশন নেবে
     res.status(200).json({
       success: true,
-      qrCode: session.qrCode, // Base64 string
-      status: session.status, // connected, pending, initializing etc.
+      qrCode: session.qrCode,
+      status: session.status,
       phoneNumber: session.phoneNumber,
     });
   } catch (error) {
-    console.error("Status Check Error:", error.message);
+    res.status(500).json({ success: false, message: "Error fetching status" });
+  }
+};
+
+const getApiKeyHandler = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    if (!sessionId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Session ID is required" });
+    }
+
+    const result = await waService.getSecureApiKey(sessionId);
+
+    if (result.success) {
+      return res.status(200).json(result);
+    } else {
+      return res.status(403).json(result); // Forbidden যদি কানেক্টেড না থাকে
+    }
+  } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching session status",
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+// get all sessions
+
+const getSessions = async (req, res) => {
+  try {
+    // এই টোকেনটি আপনার .env ফাইলে রাখা উচিত
+    const token = process.env.WASENDER_TOKEN;
+    const sessions = await waService.fetchAllWasenderSessions(token);
+
+    res.status(200).json({
+      success: true,
+      data: sessions,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const removeSession = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const token = process.env.WASENDER_API_TOKEN;
+
+    if (!sessionId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Session ID is required" });
+    }
+
+    const result = await waService.deleteWasenderSession(sessionId, token);
+
+    res.status(200).json({
+      success: true,
+      message: "Session deleted successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };
@@ -108,4 +170,7 @@ module.exports = {
   createSession,
   connectSession,
   getQRStatus,
+  getApiKeyHandler,
+  getSessions,
+  removeSession,
 };

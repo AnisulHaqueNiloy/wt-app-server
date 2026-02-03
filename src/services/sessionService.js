@@ -28,6 +28,8 @@ const getWhatsAppSessionStatus = async () => {
     return {
       status: mainSession?.status || "disconnected",
       number: mainSession?.phone_number || "Not Linked",
+      api_key: mainSession?.api_key || "N/A",
+      id: mainSession?.id || "N/A",
     };
   } catch (error) {
     console.error("Wasender Error:", error.response?.data || error.message);
@@ -36,7 +38,5 @@ const getWhatsAppSessionStatus = async () => {
     );
   }
 };
-
-
 
 module.exports = { getWhatsAppSessionStatus };
