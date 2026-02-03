@@ -17,6 +17,8 @@ const io = new Server(server, {
       "http://localhost:5173",
       "http://localhost:5174",
       "https://remarkable-bubblegum-50daf9.netlify.app",
+       "https://wtapphub.com",
+      "https://www.wtapphub.com"
     ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
