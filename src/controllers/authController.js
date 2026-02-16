@@ -15,7 +15,7 @@ const setTokenCookie = (res, token) => {
   };
   res.cookie("jwt", token, cookieOptions);
 };
-
+// issue have been fixed
 /**
  * register user.........
  */
